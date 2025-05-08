@@ -1,1 +1,0 @@
-# hotcoldvote.github.io
