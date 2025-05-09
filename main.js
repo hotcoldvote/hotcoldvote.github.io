@@ -49,21 +49,17 @@ for (const element of pics) {
     picskeys.push(element[0]);
 }
 combs = combinations(picskeys);
-console.log(combs)
-console.log(combs.length)
 visited = [];
 
 //main code
 
 for (let i=0; i<100; i++) {
-    console.log(pics.toSorted(function(a, b) {return b[1] - a[1];}));
+    document.getElementById("ranking").innerText = (pics.toSorted(function(a, b) {return b[1] - a[1];}));
     let rpics = combs[randint(0, combs.length - 1)];
     while (visited.includes(rpics)) {
         rpics = combs[randint(0, combs.length - 1)];
-        console.log("changing...")
     }
     visited.push(rpics);
-    console.log(visited)
     var lisrpics = rpics.split(" ");
     var gA = parseInt(lisrpics[0]);
     var gB = parseInt(lisrpics[1]);
@@ -72,7 +68,7 @@ for (let i=0; i<100; i++) {
     var rA = (pics[findInMatrix(pics, gA)])[1];
     var rB = pics[findInMatrix(pics, gB)][1];
 
-    console.log(gA, gB);
+    document.getElementById("nums").innerText = (gA, gB);
     var choice = prompt("which is higher [l/r]: ").toLowerCase();
     if (choice == "l") {
         sA = sA + 1;
