@@ -67,8 +67,7 @@ for (let i=0; i<100; i++) {
     var sB = 0;
     var rA = (pics[findInMatrix(pics, gA)])[1];
     var rB = pics[findInMatrix(pics, gB)][1];
-
-    document.getElementById("nums").innerText = (gA, gB);
+    
     var choice = prompt(`${gA} or ${gB} good sir say which is higher [l/r]: `).toLowerCase();
     if (choice == "l") {
         sA = sA + 1;
