@@ -54,7 +54,7 @@ visited = [];
 //main code
 
 for (let i=0; i<100; i++) {
-    document.getElementById("ranking").innerText = (pics.toSorted(function(a, b) {return b[1] - a[1];}));
+    var rizz = prompt(`${pics.toSorted(function(a, b) {return b[1] - a[1];})} type anything to continue: `);
     let rpics = combs[randint(0, combs.length - 1)];
     while (visited.includes(rpics)) {
         rpics = combs[randint(0, combs.length - 1)];
@@ -69,7 +69,7 @@ for (let i=0; i<100; i++) {
     var rB = pics[findInMatrix(pics, gB)][1];
 
     document.getElementById("nums").innerText = (gA, gB);
-    var choice = prompt("which is higher [l/r]: ").toLowerCase();
+    var choice = prompt(` ${gA, gB} which is higher [l/r]: `).toLowerCase();
     if (choice == "l") {
         sA = sA + 1;
     }
