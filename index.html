@@ -37,7 +37,7 @@ let picskeys = [];
 let combs = [];
 let visited = [];
 let currentPair = null;
-let isUserReady = false; // A flag to indicate if the user has made a choice
+let setupFinished = false; // A flag to indicate if setup has finished
 
 // Create an image dictionary (replace with actual image URLs)
 const imageDictionary = {
@@ -54,9 +54,9 @@ const imageDictionary = {
 
 socket.onmessage = event => {
     const data = JSON.parse(event.data);
-    if (data.type === 'array_update' && !isUserReady) {
+    if (data.type === 'array_update') {
         pics = data.data;  // Update the global state with the server data
-        setupAfterLoad();   // Only call this once the user is ready to make a choice
+        setupAfterLoad(); 
     }
 };
 
@@ -80,9 +80,11 @@ function setupAfterLoad() {
     combs = combinations(picskeys);
     visited = [];
     displayArray();
-    nextPair();
+    if (setupFinished === false) { // if setting up for first time, show next pair, else, don't show
+        nextPair();
+        setupFinished = true;
+    }
     document.getElementById("choices").style.display = "block";
-    isUserReady = true;  // Set the user as ready after the array has been loaded
 }
 
 function randint(min, max) {
@@ -156,8 +158,6 @@ function handleChoice(choice) {
     displayArray();
     socket.send(JSON.stringify({ type: 'update_array', data: pics }));
 
-    // Reset the ready flag so that a new message from the server will only process after the next choice
-    isUserReady = false;
     nextPair();
 
     // Request updated data from the server after the choice is made
