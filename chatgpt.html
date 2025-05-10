@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Elo Ranking</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        #choices { margin-top: 20px; }
+        button { margin: 5px; padding: 10px 20px; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+<h2>Sorted Array (by Elo Rating)</h2>
+<pre id="arrayDisplay"></pre>
+
+<div id="currentPair"></div>
+
+<div id="choices">
+    <button onclick="handleChoice('l')">Left</button>
+    <button onclick="handleChoice('r')">Right</button>
+</div>
+
+<script>
+const K = 40;
+const socket = new WebSocket(`wss://hotcoldvote-github-io.onrender.com/`);
+
+socket.onmessage = event => {
+    const data = JSON.parse(event.data);
+    if (data.type === 'array_update') {
+        document.getElementById('arrayDisplay').textContent = JSON.stringify(data.data, null, 2);
+    }
+};
+
+function randint(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function combinations(array) {
+    return array.flatMap((v, i) => array.slice(i + 1).map(w => v + ' ' + w));
+}
+
+function findInMatrix(matrix, target) {
+    for (let a = 0; a < matrix.length; a++) {
+        if (matrix[a][0] === target) return a;
+    }
+    return -1;
+}
+
+function elo(rA, rB, sA, sB) {
+    let eA = 1 / (1 + Math.pow(10, (rB - rA) / 400));
+    let eB = 1 / (1 + Math.pow(10, (rA - rB) / 400));
+    rA += K * (sA - eA);
+    rB += K * (sB - eB);
+    return [rA, rB];
+}
+
+// Initialize
+let pics = [];
+while (pics.length < 10) {
+    let rint = randint(0, 100);
+    if (!pics.some(p => p[0] === rint)) {
+        pics.push([rint, 1000]);
+    }
+}
+let picskeys = pics.map(p => p[0]);
+let combs = combinations(picskeys);
+let visited = [];
+let currentPair = null;
+
+function displayArray() {
+    let sorted = [...pics].sort((a, b) => b[1] - a[1]);
+    document.getElementById('arrayDisplay').textContent = JSON.stringify(sorted, null, 2);
+}
+
+function nextPair() {
+    if (visited.length === combs.length) visited = [];
+
+    let rpics = combs[randint(0, combs.length - 1)];
+    while (visited.includes(rpics)) {
+        rpics = combs[randint(0, combs.length - 1)];
+    }
+    visited.push(rpics);
+
+    let [gA, gB] = rpics.split(" ").map(Number);
+    currentPair = { gA, gB };
+    document.getElementById('currentPair').textContent = `Which is better? ${gA} (Left) or ${gB} (Right)`;
+}
+
+function handleChoice(choice) {
+    if (!currentPair) return;
+
+    let { gA, gB } = currentPair;
+    let sA = (choice === 'l') ? 1 : 0;
+    let sB = (choice === 'r') ? 1 : 0;
+
+    let idxA = findInMatrix(pics, gA);
+    let idxB = findInMatrix(pics, gB);
+
+    let rA = pics[idxA][1];
+    let rB = pics[idxB][1];
+
+    let [newRA, newRB] = elo(rA, rB, sA, sB);
+    pics[idxA][1] = newRA;
+    pics[idxB][1] = newRB;
+
+    displayArray();
+    nextPair();
+}
+
+// Initial display
+displayArray();
+nextPair();
+</script>
+
+</body>
+</html>
