@@ -3,7 +3,7 @@
 <head>
     <title>Elo Ranking</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; }
+        body { font: helvetica neue, helvetica, arial; font-family: sans-serif; padding: 20px; }
         #choices { margin-top: 20px; }
         button { margin: 5px; padding: 10px 20px; font-size: 16px; }
         img { width: auto; height: 500px; }
@@ -12,7 +12,7 @@
 <body>
 
 <h2>Sorted Array (by Elo Rating)</h2>
-<pre id="arrayDisplay">Loading...</pre>
+<div id="arrayDisplay">Loading...</div>
 
 <div id="currentPair">
     <div id="leftImage" style="display:inline-block; margin-right: 20px;">
@@ -112,7 +112,16 @@ function elo(rA, rB, sA, sB) {
 
 function displayArray() {
     let sorted = [...pics].sort((a, b) => b[1] - a[1]);
-    document.getElementById('arrayDisplay').textContent = JSON.stringify(sorted, null, 2);
+
+    const container = document.getElementById('arrayDisplay');
+    container.innerHTML = "<h3>Current Rankings:</h3><ul>";
+
+    for (const [id, elo] of sorted) {
+        const filename = imageDictionary[id] || `Unknown (ID: ${id})`;
+        container.innerHTML += `<li><strong>${filename}</strong> — Elo: ${elo.toFixed(1)}</li>`;
+    }
+
+    container.innerHTML += "</ul>";
 }
 
 function nextPair() {
