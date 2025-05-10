@@ -11,11 +11,11 @@
 <body>
 
 <h2>Sorted Array (by Elo Rating)</h2>
-<pre id="arrayDisplay"></pre>
+<pre id="arrayDisplay">Loading...</pre>
 
 <div id="currentPair"></div>
 
-<div id="choices">
+<div id="choices" style="display:none;">
     <button onclick="handleChoice('l')">Left</button>
     <button onclick="handleChoice('r')">Right</button>
 </div>
@@ -24,12 +24,43 @@
 const K = 40;
 const socket = new WebSocket(`wss://hotcoldvote-github-io.onrender.com/`);
 
+let pics = [];
+let picskeys = [];
+let combs = [];
+let visited = [];
+let currentPair = null;
+
 socket.onmessage = event => {
     const data = JSON.parse(event.data);
     if (data.type === 'array_update') {
-        document.getElementById('arrayDisplay').textContent = JSON.stringify(data.data, null, 2);
+        pics = data.data;
+        setupAfterLoad();
     }
 };
+
+socket.onopen = () => {
+    // Request the array on connect
+    socket.send(JSON.stringify({ type: 'request_array' }));
+};
+
+function setupDefaultArray() {
+    pics = [[1,1000], [2,1000], [3,1000], [4,1000], [5,1000], [6,1000], [7,1000], [8,1000], [9,1000]];
+    socket.send(JSON.stringify({ type: 'update_array', data: pics }));
+    setupAfterLoad();
+}
+
+function setupAfterLoad() {
+    if (!pics || pics.length === 0) {
+        setupDefaultArray();
+        return;
+    }
+    picskeys = pics.map(p => p[0]);
+    combs = combinations(picskeys);
+    visited = [];
+    displayArray();
+    nextPair();
+    document.getElementById("choices").style.display = "block";
+}
 
 function randint(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -53,19 +84,6 @@ function elo(rA, rB, sA, sB) {
     rB += K * (sB - eB);
     return [rA, rB];
 }
-
-// Initialize
-let pics = [];
-while (pics.length < 10) {
-    let rint = randint(0, 100);
-    if (!pics.some(p => p[0] === rint)) {
-        pics.push([rint, 1000]);
-    }
-}
-let picskeys = pics.map(p => p[0]);
-let combs = combinations(picskeys);
-let visited = [];
-let currentPair = null;
 
 function displayArray() {
     let sorted = [...pics].sort((a, b) => b[1] - a[1]);
@@ -104,12 +122,9 @@ function handleChoice(choice) {
     pics[idxB][1] = newRB;
 
     displayArray();
+    socket.send(JSON.stringify({ type: 'update_array', data: pics }));
     nextPair();
 }
-
-// Initial display
-displayArray();
-nextPair();
 </script>
 
 </body>
