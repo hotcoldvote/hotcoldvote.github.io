@@ -30,13 +30,14 @@
 
 <script>
 const K = 40;
-const socket = new WebSocket(`wss://hotcoldvote-github-io.onrender.com/`);
+const socket = new WebSocket('wss://hotcoldvote-github-io.onrender.com/');
 
 let pics = [];
 let picskeys = [];
 let combs = [];
 let visited = [];
 let currentPair = null;
+let isUserReady = false; // A flag to indicate if the user has made a choice
 
 // Create an image dictionary (replace with actual image URLs)
 const imageDictionary = {
@@ -53,9 +54,9 @@ const imageDictionary = {
 
 socket.onmessage = event => {
     const data = JSON.parse(event.data);
-    if (data.type === 'array_update') {
-        pics = data.data;
-        setupAfterLoad();
+    if (data.type === 'array_update' && !isUserReady) {
+        pics = data.data;  // Update the global state with the server data
+        setupAfterLoad();   // Only call this once the user is ready to make a choice
     }
 };
 
@@ -81,6 +82,7 @@ function setupAfterLoad() {
     displayArray();
     nextPair();
     document.getElementById("choices").style.display = "block";
+    isUserReady = true;  // Set the user as ready after the array has been loaded
 }
 
 function randint(min, max) {
@@ -124,8 +126,7 @@ function nextPair() {
     currentPair = { gA, gB };
     
     // Update the current pair with images
-    document.getElementById('currentPair').innerHTML = `
-        Which is better? <br>
+    document.getElementById('currentPair').innerHTML = `Which is better? <br>
         <div id="leftImage" style="display:inline-block; margin-right: 20px;">
             <img src="${imageDictionary[gA]}" alt="Image ${gA}">
         </div>
@@ -154,7 +155,13 @@ function handleChoice(choice) {
 
     displayArray();
     socket.send(JSON.stringify({ type: 'update_array', data: pics }));
+
+    // Reset the ready flag so that a new message from the server will only process after the next choice
+    isUserReady = false;
     nextPair();
+
+    // Request updated data from the server after the choice is made
+    socket.send(JSON.stringify({ type: 'request_array' }));
 }
 </script>
 
