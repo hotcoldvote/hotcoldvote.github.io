@@ -124,7 +124,7 @@ function nextPair() {
     currentPair = { gA, gB };
     
     // Update the current pair with images
-    document.getElementById('currentPair').innerHTML = 
+    document.getElementById('currentPair').innerHTML = `
         Which is better? <br>
         <div id="leftImage" style="display:inline-block; margin-right: 20px;">
             <img src="${imageDictionary[gA]}" alt="Image ${gA}">
@@ -132,7 +132,7 @@ function nextPair() {
         <div id="rightImage" style="display:inline-block;">
             <img src="${imageDictionary[gB]}" alt="Image ${gB}">
         </div>
-    ;
+    `;
 }
 
 function handleChoice(choice) {
