@@ -32,7 +32,7 @@
 const K = 40;
 const socket = new WebSocket(`wss://hotcoldvote-github-io.onrender.com/`);
 
-let pics = [];
+let pics = []; // This is the global state, updated periodically from the server
 let picskeys = [];
 let combs = [];
 let visited = [];
@@ -51,10 +51,12 @@ const imageDictionary = {
     9: 'image9.jpg',
 };
 
+let localPics = []; // Store Elo ratings for the user (local state)
+
 socket.onmessage = event => {
     const data = JSON.parse(event.data);
     if (data.type === 'array_update') {
-        pics = data.data;
+        pics = data.data; // Update the global state with the server data
         setupAfterLoad();
     }
 };
@@ -66,6 +68,7 @@ socket.onopen = () => {
 
 function setupDefaultArray() {
     pics = [[1,1000], [2,1000], [3,1000], [4,1000], [5,1000], [6,1000], [7,1000], [8,1000], [9,1000]];
+    localPics = [...pics]; // Initialize local Elo state for the user
     socket.send(JSON.stringify({ type: 'update_array', data: pics }));
     setupAfterLoad();
 }
@@ -107,7 +110,7 @@ function elo(rA, rB, sA, sB) {
 }
 
 function displayArray() {
-    let sorted = [...pics].sort((a, b) => b[1] - a[1]);
+    let sorted = [...localPics].sort((a, b) => b[1] - a[1]);
     document.getElementById('arrayDisplay').textContent = JSON.stringify(sorted, null, 2);
 }
 
@@ -124,8 +127,7 @@ function nextPair() {
     currentPair = { gA, gB };
     
     // Update the current pair with images
-    document.getElementById('currentPair').innerHTML = `
-        Which is better? <br>
+    document.getElementById('currentPair').innerHTML = `Which is better? <br>
         <div id="leftImage" style="display:inline-block; margin-right: 20px;">
             <img src="${imageDictionary[gA]}" alt="Image ${gA}">
         </div>
@@ -142,18 +144,18 @@ function handleChoice(choice) {
     let sA = (choice === 'l') ? 1 : 0;
     let sB = (choice === 'r') ? 1 : 0;
 
-    let idxA = findInMatrix(pics, gA);
-    let idxB = findInMatrix(pics, gB);
+    let idxA = findInMatrix(localPics, gA);
+    let idxB = findInMatrix(localPics, gB);
 
-    let rA = pics[idxA][1];
-    let rB = pics[idxB][1];
+    let rA = localPics[idxA][1];
+    let rB = localPics[idxB][1];
 
     let [newRA, newRB] = elo(rA, rB, sA, sB);
-    pics[idxA][1] = newRA;
-    pics[idxB][1] = newRB;
+    localPics[idxA][1] = newRA;
+    localPics[idxB][1] = newRB;
 
-    displayArray();
-    socket.send(JSON.stringify({ type: 'update_array', data: pics }));
+    displayArray(); // Update the display with the new Elo ratings for the current user
+    socket.send(JSON.stringify({ type: 'update_array', data: localPics })); // Send the local update to the server
     nextPair();
 }
 </script>
