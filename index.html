@@ -6,9 +6,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
-    <p>mess around with <strong>this webpage</strong> as you like.</p>
-    
-    <script src="main.js"></script>
-    
+  <h2>Shared Array (Live)</h2>
+  <pre id="arrayDisplay">Connecting...</pre>
+
+  <h3>Update the Array</h3>
+  <textarea id="arrayInput" rows="4" cols="50">["new","values"]</textarea><br>
+  <button onclick="sendArray()">Update Array</button>
+
+  <script>
+    // Replace this with your deployed backend URL
+    const socket = new WebSocket(`wss://hotcoldvote-github-io.onrender.com/`);
+
+    socket.onmessage = event => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'array_update') {
+        document.getElementById('arrayDisplay').textContent = JSON.stringify(data.data, null, 2);
+      }
+    };
+
+    function sendArray() {
+      try {
+        const input = document.getElementById('arrayInput').value;
+        const newArray = JSON.parse(input);
+        socket.send(JSON.stringify({ type: 'update_array', data: newArray }));
+      } catch (err) {
+        alert('Invalid JSON array');
+      }
+    }
+  </script>
+  <!-- <script src="main.js"></script> -->
   </body>
 </html>
