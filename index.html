@@ -81,7 +81,7 @@ function setupAfterLoad() {
     visited = [];
     displayArray();
     if (setupFinished === false) { // if setting up for first time, show next pair, else, don't show
-        let rizzCAPTCHA = prompt("This site is protected by rizzCAPTCHA. Please input the alias of Sean Combs to continue. If you fail, please close and reopen the website and try again.").toLowerCase();
+        let rizzCAPTCHA = prompt("This site is protected by rizzCAPTCHA. Please input the alias of Sean Combs to continue.").toLowerCase();
         if (rizzCAPTCHA === "diddy") {
             rizzCAPTCHA = "";
             nextPair();
