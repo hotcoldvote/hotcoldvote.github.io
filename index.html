@@ -81,14 +81,14 @@ function setupAfterLoad() {
     visited = [];
     displayArray();
     if (setupFinished === false) { // if setting up for first time, show next pair, else, don't show
-        let rizzCAPTCHA = prompt("This site is protected by rizzCAPTCHA. Please input the alias of Shawn Combs to continue. If you fail, please reload the website and try again.").toLowerCase();
+        let rizzCAPTCHA = prompt("This site is protected by rizzCAPTCHA. Please input the alias of Sean Combs to continue. If you fail, please close and reopen the website and try again.").toLowerCase();
         if (rizzCAPTCHA === "diddy") {
             rizzCAPTCHA = "";
             nextPair();
         }
         else {
             while (true) {
-                rizzCAPTCHA = prompt("You have been defeated by rizzCAPTCHA, please reload the page and try again.");
+                rizzCAPTCHA = prompt("You have been defeated by rizzCAPTCHA, please reopen the website and try again.");
             }
         }
         setupFinished = true;
