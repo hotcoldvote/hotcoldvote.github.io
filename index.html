@@ -87,7 +87,9 @@ function setupAfterLoad() {
             nextPair();
         }
         else {
-            document.getElementById('arrayDisplay').innerHTML = "<h2>You were defeated by rizzCAPTCHA. Please reload the website and try again.</h2>";
+            while (true) {
+                rizzCAPTCHA = prompt("You have been defeated by rizzCAPTCHA, please reload the page and try again.");
+            }
         }
         setupFinished = true;
     }
