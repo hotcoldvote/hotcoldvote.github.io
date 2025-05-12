@@ -81,6 +81,13 @@ function setupAfterLoad() {
     visited = [];
     displayArray();
     if (setupFinished === false) { // if setting up for first time, show next pair, else, don't show
+        let rizzCAPTCHA = prompt("This site is protected by rizzCAPTCHA. Please input the alias of Shawn Combs to continue. If you fail the site tab will close, please reopen it and try again.").toLowerCase();
+        if (rizzCAPTCHA === "diddy") {
+            rizzCAPTCHA = "";
+        }
+        else {
+            window.close();
+        }
         nextPair();
         setupFinished = true;
     }
