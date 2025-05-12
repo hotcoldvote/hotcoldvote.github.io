@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <title>Elo Ranking</title>
     <style>
         body {font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; padding: 20px; }
@@ -23,9 +24,22 @@
     </div>
 </div>
 
-<div id="choices" style="display:none;">
-    <button onclick="handleChoice('l')">Left</button>
-    <button onclick="handleChoice('r')">Right</button>
+<div id="choices" style="margin-top: 20px;">
+    <button id="leftBtn"
+        class="g-recaptcha"
+        data-sitekey="6LfiRzcrAAAAAPLSveBWk057juLIEWv2NYilT9Sk"
+        data-callback="onRecaptchaLeft"
+        data-size="invisible">
+        Left
+    </button>
+
+    <button id="rightBtn"
+        class="g-recaptcha"
+        data-sitekey="6LfiRzcrAAAAAPLSveBWk057juLIEWv2NYilT9Sk"
+        data-callback="onRecaptchaRight"
+        data-size="invisible">
+        Right
+    </button>
 </div>
 
 <script>
@@ -37,31 +51,23 @@ let picskeys = [];
 let combs = [];
 let visited = [];
 let currentPair = null;
-let setupFinished = false; // A flag to indicate if setup has finished
+let setupFinished = false;
 
-// Create an image dictionary (replace with actual image URLs)
 const imageDictionary = {
-    1: 'image1.jpg',  // Replace 'image1.jpg' with actual URL
-    2: 'image2.jpg',
-    3: 'image3.jpg',
-    4: 'image4.jpg',
-    5: 'image5.jpg',
-    6: 'image6.jpg',
-    7: 'image7.jpg',
-    8: 'image8.jpg',
-    9: 'image9.jpg',
+    1: 'image1.jpg', 2: 'image2.jpg', 3: 'image3.jpg',
+    4: 'image4.jpg', 5: 'image5.jpg', 6: 'image6.jpg',
+    7: 'image7.jpg', 8: 'image8.jpg', 9: 'image9.jpg',
 };
 
 socket.onmessage = event => {
     const data = JSON.parse(event.data);
     if (data.type === 'array_update') {
-        pics = data.data;  // Update the global state with the server data
+        pics = data.data;
         setupAfterLoad(); 
     }
 };
 
 socket.onopen = () => {
-    // Request the array on connect
     socket.send(JSON.stringify({ type: 'request_array' }));
 };
 
@@ -80,7 +86,7 @@ function setupAfterLoad() {
     combs = combinations(picskeys);
     visited = [];
     displayArray();
-    if (setupFinished === false) { // if setting up for first time, show next pair, else, don't show
+    if (setupFinished === false) {
         nextPair();
         setupFinished = true;
     }
@@ -135,8 +141,7 @@ function nextPair() {
 
     let [gA, gB] = rpics.split(" ").map(Number);
     currentPair = { gA, gB };
-    
-    // Update the current pair with images
+
     document.getElementById('currentPair').innerHTML = `Which is better? <br>
         <div id="leftImage" style="display:inline-block; margin-right: 20px;">
             <img src="${imageDictionary[gA]}" alt="Image ${gA}">
@@ -166,12 +171,29 @@ function handleChoice(choice) {
 
     displayArray();
     socket.send(JSON.stringify({ type: 'update_array', data: pics }));
-
     nextPair();
-
-    // Request updated data from the server after the choice is made
     socket.send(JSON.stringify({ type: 'request_array' }));
 }
+
+// reCAPTCHA Callbacks
+function onRecaptchaLeft(token) {
+    handleChoice('l');
+}
+
+function onRecaptchaRight(token) {
+    handleChoice('r');
+}
+
+// Trigger reCAPTCHA on click
+document.getElementById('leftBtn').addEventListener('click', function (e) {
+    e.preventDefault();
+    grecaptcha.execute();
+});
+
+document.getElementById('rightBtn').addEventListener('click', function (e) {
+    e.preventDefault();
+    grecaptcha.execute();
+});
 </script>
 
 </body>
