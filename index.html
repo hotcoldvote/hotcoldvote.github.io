@@ -81,14 +81,14 @@ function setupAfterLoad() {
     visited = [];
     displayArray();
     if (setupFinished === false) { // if setting up for first time, show next pair, else, don't show
-        let rizzCAPTCHA = prompt("This site is protected by rizzCAPTCHA. Please input the alias of Shawn Combs to continue. If you fail the site tab will close, please reopen it and try again.").toLowerCase();
+        let rizzCAPTCHA = prompt("This site is protected by rizzCAPTCHA. Please input the alias of Shawn Combs to continue. If you fail, please reload the website and try again.").toLowerCase();
         if (rizzCAPTCHA === "diddy") {
             rizzCAPTCHA = "";
+            nextPair();
         }
         else {
-            window.close();
+            document.getElementById('arrayDisplay').innerHTML = "<h2>You were defeated by rizzCAPTCHA. Please reload the website and try again.</h2>";
         }
-        nextPair();
         setupFinished = true;
     }
     document.getElementById("choices").style.display = "block";
