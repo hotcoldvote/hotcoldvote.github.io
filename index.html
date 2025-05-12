@@ -152,7 +152,7 @@ function nextPair() {
     `;
 }
 
-function handleChoice(choice) {
+function handleChoice(choice, recaptchaToken) {
     if (!currentPair) return;
 
     let { gA, gB } = currentPair;
@@ -170,18 +170,18 @@ function handleChoice(choice) {
     pics[idxB][1] = newRB;
 
     displayArray();
-    socket.send(JSON.stringify({ type: 'update_array', data: pics }));
+    socket.send(JSON.stringify({ type: 'update_array', recaptchaToken: recaptchaToken, data: pics }));
     nextPair();
     socket.send(JSON.stringify({ type: 'request_array' }));
 }
 
 // reCAPTCHA Callbacks
 function onRecaptchaLeft(token) {
-    handleChoice('l');
+    handleChoice('l', token);
 }
 
 function onRecaptchaRight(token) {
-    handleChoice('r');
+    handleChoice('r', token);
 }
 
 // Trigger reCAPTCHA on click
