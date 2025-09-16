@@ -7,6 +7,43 @@
         #choices { margin-top: 20px; }
         button { margin: 5px; padding: 10px 20px; font-size: 16px; }
         img { width: auto; height: 200px; }
+        .image-container {
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            display: block;
+            max-width: 300px; /* adjust size as you like */
+            border-radius: 10px;
+        }
+
+        .overlay-btn {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+            opacity: 0;
+            transition: background 0.2s ease, opacity 0.2s ease;
+            cursor: pointer;
+        }
+
+        .overlay-btn:hover {
+            background: rgba(0, 0, 0, 0.4);
+            opacity: 1;
+        }
+
+        .overlay-btn:active {
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -14,18 +51,18 @@
 <h1><b style="color:red;">HOT</b><b style="color:blue;">COLD</b><b>VOTE</b></h1>
 <div id="arrayDisplay">Loading...</div>
 
-<div id="currentPair">
-    <div id="leftImage" style="display:inline-block; margin-right: 20px;">
-        <!-- Left image will appear here -->
+<div id="currentPair" style="display: flex; gap: 20px; justify-content: center; align-items: center;">
+    <!-- Left choice -->
+    <div id="leftImage" class="image-container">
+        <img src="" alt="Left Image">
+        <button class="overlay-btn" onclick="handleChoice('l')">this one</button>
     </div>
-    <div id="rightImage" style="display:inline-block;">
-        <!-- Right image will appear here -->
-    </div>
-</div>
 
-<div id="choices" style="display:none;">
-    <button onclick="handleChoice('l')">Left</button>
-    <button onclick="handleChoice('r')">Right</button>
+    <!-- Right choice -->
+    <div id="rightImage" class="image-container">
+        <img src="" alt="Right Image">
+        <button class="overlay-btn" onclick="handleChoice('r')">this one</button>
+    </div>
 </div>
 
 <script>
