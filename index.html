@@ -160,26 +160,17 @@ function handleChoice(choice) {
     if (!currentPair) return;
 
     let { gA, gB } = currentPair;
-    let sA = (choice === 'l') ? 1 : 0;
-    let sB = (choice === 'r') ? 1 : 0;
 
-    let idxA = findInMatrix(pics, gA);
-    let idxB = findInMatrix(pics, gB);
+    // Send only the choice to the server
+    socket.send(JSON.stringify({
+        type: 'choice',
+        data: { gA, gB, choice }
+    }));
 
-    let rA = pics[idxA][1];
-    let rB = pics[idxB][1];
-
-    let [newRA, newRB] = elo(rA, rB, sA, sB);
-    pics[idxA][1] = newRA;
-    pics[idxB][1] = newRB;
-
-    displayArray();
-    socket.send(JSON.stringify({ type: 'update_array', data: pics }));
+    // Request updated array after server processes choice
+    socket.send(JSON.stringify({ type: 'request_array' }));
 
     nextPair();
-
-    // Request updated data from the server after the choice is made
-    socket.send(JSON.stringify({ type: 'request_array' }));
 }
 </script>
 
