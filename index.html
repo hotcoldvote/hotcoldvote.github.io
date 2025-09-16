@@ -3,22 +3,20 @@
 <head>
     <title>Elo Ranking</title>
     <style>
-        body {font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; padding: 20px; }
-        #choices { margin-top: 20px; }
-        button { margin: 5px; padding: 10px 20px; font-size: 16px; }
-        img { width: auto; height: 200px; }
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            padding: 20px;
+        }
+        img {
+            width: auto;
+            height: 200px;
+            border-radius: 10px;
+        }
         .image-container {
             position: relative;
             display: inline-block;
-            overflow: hidden;
+            margin: 0 10px;
         }
-
-        .image-container img {
-            display: block;
-            max-width: 300px; /* adjust size as you like */
-            border-radius: 10px;
-        }
-
         .overlay-btn {
             position: absolute;
             top: 0;
@@ -33,13 +31,12 @@
             opacity: 0;
             transition: background 0.2s ease, opacity 0.2s ease;
             cursor: pointer;
+            border-radius: 10px;
         }
-
         .overlay-btn:hover {
             background: rgba(0, 0, 0, 0.4);
             opacity: 1;
         }
-
         .overlay-btn:active {
             background: rgba(0, 0, 0, 0.7);
             opacity: 1;
@@ -51,17 +48,12 @@
 <h1><b style="color:red;">HOT</b><b style="color:blue;">COLD</b><b>VOTE</b></h1>
 <div id="arrayDisplay">Loading...</div>
 
-<div id="currentPair" style="display: flex; gap: 20px; justify-content: center; align-items: center;">
-    <!-- Left choice -->
+<div id="currentPair" style="display:flex; gap:20px; justify-content:center; align-items:center;">
     <div id="leftImage" class="image-container">
-        <img src="" alt="Left Image">
-        <button class="overlay-btn" onclick="handleChoice('l')">this one</button>
+        <!-- Left image goes here -->
     </div>
-
-    <!-- Right choice -->
     <div id="rightImage" class="image-container">
-        <img src="" alt="Right Image">
-        <button class="overlay-btn" onclick="handleChoice('r')">this one</button>
+        <!-- Right image goes here -->
     </div>
 </div>
 
@@ -74,11 +66,10 @@ let picskeys = [];
 let combs = [];
 let visited = [];
 let currentPair = null;
-let setupFinished = false; // A flag to indicate if setup has finished
+let setupFinished = false;
 
-// Create an image dictionary (replace with actual image URLs)
 const imageDictionary = {
-    1: 'image1.jpg',  // Replace 'image1.jpg' with actual URL
+    1: 'image1.jpg',
     2: 'image2.jpg',
     3: 'image3.jpg',
     4: 'image4.jpg',
@@ -92,13 +83,12 @@ const imageDictionary = {
 socket.onmessage = event => {
     const data = JSON.parse(event.data);
     if (data.type === 'array_update') {
-        pics = data.data;  // Update the global state with the server data
+        pics = data.data;
         setupAfterLoad(); 
     }
 };
 
 socket.onopen = () => {
-    // Request the array on connect
     socket.send(JSON.stringify({ type: 'request_array' }));
 };
 
@@ -117,20 +107,17 @@ function setupAfterLoad() {
     combs = combinations(picskeys);
     visited = [];
     displayArray();
-    if (setupFinished === false) { // if setting up for first time, show next pair, else, don't show
+    if (setupFinished === false) {
         let rizzCAPTCHA = prompt("This site is protected by rizzCAPTCHA. Please input the alias of Sean Combs to continue.").toLowerCase();
         if (rizzCAPTCHA === "diddy") {
-            rizzCAPTCHA = "";
             nextPair();
-        }
-        else {
+        } else {
             while (true) {
                 rizzCAPTCHA = prompt("You have been defeated by rizzCAPTCHA, please reopen the website and try again.");
             }
         }
         setupFinished = true;
     }
-    document.getElementById("choices").style.display = "block";
 }
 
 function randint(min, max) {
@@ -141,38 +128,19 @@ function combinations(array) {
     return array.flatMap((v, i) => array.slice(i + 1).map(w => v + ' ' + w));
 }
 
-function findInMatrix(matrix, target) {
-    for (let a = 0; a < matrix.length; a++) {
-        if (matrix[a][0] === target) return a;
-    }
-    return -1;
-}
-
-function elo(rA, rB, sA, sB) {
-    let eA = 1 / (1 + Math.pow(10, (rB - rA) / 400));
-    let eB = 1 / (1 + Math.pow(10, (rA - rB) / 400));
-    rA += K * (sA - eA);
-    rB += K * (sB - eB);
-    return [rA, rB];
-}
-
 function displayArray() {
     let sorted = [...pics].sort((a, b) => b[1] - a[1]);
-
     const container = document.getElementById('arrayDisplay');
     container.innerHTML = "<h3>Current Rankings:</h3><ul>";
-
     for (const [id, elo] of sorted) {
         const filename = imageDictionary[id] || `Unknown (ID: ${id})`;
         container.innerHTML += `<li><strong>${filename}</strong> — Elo: ${elo.toFixed(1)}</li>`;
     }
-
     container.innerHTML += "</ul>";
 }
 
 function nextPair() {
     if (visited.length === combs.length) visited = [];
-
     let rpics = combs[randint(0, combs.length - 1)];
     while (visited.includes(rpics)) {
         rpics = combs[randint(0, combs.length - 1)];
@@ -181,32 +149,25 @@ function nextPair() {
 
     let [gA, gB] = rpics.split(" ").map(Number);
     currentPair = { gA, gB };
-    
-    // Update the current pair with images
-    document.getElementById('currentPair').innerHTML = `Which is better? <br>
-        <div id="leftImage" style="display:inline-block; margin-right: 20px;">
-            <img src="${imageDictionary[gA]}" alt="Image ${gA}">
-        </div>
-        <div id="rightImage" style="display:inline-block;">
-            <img src="${imageDictionary[gB]}" alt="Image ${gB}">
-        </div>
+
+    document.getElementById('leftImage').innerHTML = `
+        <img src="${imageDictionary[gA]}" alt="Image ${gA}">
+        <button class="overlay-btn" onclick="handleChoice('l')">this one</button>
+    `;
+    document.getElementById('rightImage').innerHTML = `
+        <img src="${imageDictionary[gB]}" alt="Image ${gB}">
+        <button class="overlay-btn" onclick="handleChoice('r')">this one</button>
     `;
 }
 
 function handleChoice(choice) {
     if (!currentPair) return;
-
     let { gA, gB } = currentPair;
-
-    // Send only the choice to the server
     socket.send(JSON.stringify({
         type: 'choice',
         data: { gA, gB, choice }
     }));
-
-    // Request updated array after server processes choice
     socket.send(JSON.stringify({ type: 'request_array' }));
-
     nextPair();
 }
 </script>
