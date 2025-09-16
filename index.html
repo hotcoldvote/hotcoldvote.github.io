@@ -41,6 +41,21 @@
             background: rgba(0, 0, 0, 0.7);
             opacity: 1;
         }
+        #currentPair {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap; /* allows stacking when width is small */
+        }
+
+        /* On vertical (narrow) screens, stack vertically */
+        @media (max-width: 600px) {
+            #currentPair {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>
