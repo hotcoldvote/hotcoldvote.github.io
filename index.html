@@ -9,7 +9,7 @@
         }
         img {
             width: auto;
-            height: 200px;
+            height: 400px;
             border-radius: 10px;
         }
         .image-container {
@@ -55,6 +55,11 @@
                 flex-direction: column;
                 gap: 10px;
             }
+            img {
+                width: auto;
+                height: 200px;
+                border-radius: 10px;
+            }
         }
     </style>
 </head>
@@ -63,7 +68,7 @@
 <h1><b style="color:red;">HOT</b><b style="color:blue;">COLD</b><b>VOTE</b></h1>
 <div id="arrayDisplay">Loading...</div>
 
-<div id="currentPair" style="display:flex; gap:20px; justify-content:center; align-items:center;">
+<div id="currentPair" style="display:flex; gap:20px; justify-content:left; align-items:center;">
     <div id="leftImage" class="image-container">
         <!-- Left image goes here -->
     </div>
@@ -75,7 +80,6 @@
 <script>
 const K = 40;
 const socket = new WebSocket('wss://hotcoldserver.onrender.com');
-
 let pics = [];
 let picskeys = [];
 let combs = [];
@@ -103,8 +107,17 @@ socket.onmessage = event => {
     }
 };
 
-socket.onopen = () => {
+socket.onopen = function () {
     socket.send(JSON.stringify({ type: 'request_array' }));
+
+    var t = setInterval(function () {
+        if (socket.readyState !== 1) {
+            clearInterval(t);
+            return;
+        }
+        socket.send(JSON.stringify({ type: 'ping' }));
+        console.log("ping");
+    }, 30000);
 };
 
 function setupDefaultArray() {
@@ -123,12 +136,12 @@ function setupAfterLoad() {
     visited = [];
     displayArray();
     if (setupFinished === false) {
-        let rizzCAPTCHA = prompt("This site is protected by rizzCAPTCHA. Please input the alias of Sean Combs to continue.").toLowerCase();
+        let rizzCAPTCHA = prompt("本网站受 rizzCAPTCHA 保护。请输入 Sean Combs 的别名以继续。").toLowerCase();
         if (rizzCAPTCHA === "diddy") {
             nextPair();
         } else {
             while (true) {
-                rizzCAPTCHA = prompt("You have been defeated by rizzCAPTCHA, please reopen the website and try again.");
+                rizzCAPTCHA = prompt("您已被rizzCAPTCHA验证失败，现在您将被送往再教育营，以证明您对中共的忠诚。此次违规行为已导致您的社会信用分数被扣除50万分。请勿再次发生此类行为！请重新打开网站并重试。");
             }
         }
         setupFinished = true;
