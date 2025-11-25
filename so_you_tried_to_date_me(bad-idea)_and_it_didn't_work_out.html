@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>so you tried to date me...</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; margin: 24px; line-height:1.45; }
+    form { max-width: 800px; }
+    label { display:block; margin-top: 16px; font-weight:600; }
+    textarea { width:100%; min-height: 160px; padding:8px; font-size:14px; }
+    input[type="text"], input[type="number"] { padding:6px 8px; font-size:14px; width: 200px; }
+    .row { display:flex; gap:12px; align-items:center; margin-top:8px; }
+    .error { color: #b00020; margin-top:8px; }
+    .hint { color:#555; font-size:13px; margin-top:4px; }
+    .success { color: #0a7a0a; }
+    button { margin-top: 18px; padding:10px 14px; font-size:15px; border-radius:6px; }
+    fieldset { margin-top:12px; padding:10px; border-radius:6px; }
+  </style>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("mvugYG9-SBocN_jlt"); // <-- IMPORTANT
+    })();
+  </script>
+  <h1>i dont usually like people they dont follow basic logic you cant predict them they dont say what theyre thinking</h1>
+  <h1>if youre here that means something idk</h1>
+  <h1>review fill pls</h1>
+  <h2>it doesnt autosave because that requires effort and im lazy so just fill it all in one go ig</h2>
+  <form id="myForm" novalidate>
+
+    <!-- YES / NO -->
+    <fieldset>
+      <legend style="font-weight:700">did you ever actually go on a real life date with me</legend>
+      <div class="row">
+        <label><input type="radio" name="yesno" value="yes" required /> Yes</label>
+        <label><input type="radio" name="yesno" value="no" /> No (rip)</label>
+      </div>
+      <div id="yesnoError" class="error" aria-live="polite"></div>
+    </fieldset>
+
+    <!-- NUMBER INPUT -->
+    <label for="numberInput">if yes, how many times</label>
+    <input id="numberInput" name="numberInput" type="number" inputmode="numeric" placeholder="Enter a number" />
+    <div id="numberError" class="error" aria-live="polite"></div>
+
+    <!-- TEXTBOXES (MULTIPLE) -->
+    <label>what did you actually like about me (minimum 20 words because i cant be fucked to lower the minimum limit for this specific question)</label>
+    <textarea class="textInput" placeholder="Type your text here..."></textarea>
+    <div class="textHint hint">Words are counted by whitespace. Punctuation is stripped. Yes it actually uses a fucking dictionary</div>
+    <div class="textError error"></div>
+
+    <label>what didnt you like about me (cmon theres definitely something you can think of theres lots of things i dont like about myself) (minimum 20 words)</label>
+    <textarea class="textInput" placeholder="Type your text here..."></textarea>
+    <div class="textHint hint">Words are counted by whitespace. Punctuation is stripped. Yes it actually uses a fucking dictionary</div>
+    <div class="textError error"></div>
+
+    <!-- SLIDERS (MULTIPLE) -->
+    <label>on a scale of 1 to 67 how physically attractive am i (haha 67 joke im so funny)</label>
+    <div class="row sliderBlock">
+      <input type="range" class="slider" min="0" max="67" value="0" step="1" />
+      <input type="text" class="sliderValue" inputmode="numeric" style="width:90px;">
+    </div>
+    <div class="hint">Move the slider or type a value.</div>
+    <div class="sliderError error"></div>
+
+    <label>on a scale of 1 to 3.2e19 how (emotionally? the non physical bit idfk) attractive am i</label>
+    <div class="row sliderBlock">
+      <input type="range" class="slider" min="0" max="3.2e19" value="30" step="1" />
+      <input type="text" class="sliderValue" inputmode="numeric" style="width:90px;">
+    </div>
+    <div class="hint">Move the slider or type a value.</div>
+    <div class="sliderError error"></div>
+
+    <fieldset>
+      <legend style="font-weight:700">did you actually enjoy dating me (be honest please i fucking hate when people dont say what theyre thinking)</legend>
+      <div class="row">
+        <label><input type="radio" name="yesno2" value="yes" required /> Yes (really??)</label>
+        <label><input type="radio" name="yesno2" value="no" /> No</label>
+      </div>
+      <div id="yesno2Error" class="error" aria-live="polite"></div>
+    </fieldset>
+
+    <label>what went wrong (except your initial decision lol) (minimum 20 words)</label>
+    <textarea class="textInput" placeholder="Type your text here..."></textarea>
+    <div class="textHint hint">Words are counted by whitespace. Punctuation is stripped. Yes it actually uses a fucking dictionary</div>
+    <div class="textError error"></div>
+
+    <label>in the time until i managed to send you this shitty form have ya started dating anyone else (id be happy for ya if you are)</label>
+    <textarea class="textInput" placeholder="If you are then tell me their name or something (actually you cant because my shitty website will probably block it) (also if you are then good for you lol hope it goes better)"></textarea>
+    <div class="textHint hint">Words are counted by whitespace. Punctuation is stripped. Yes it actually uses a fucking dictionary</div>
+    <div class="textError error"></div>
+    
+    <label>extra rant / something space</label>
+    <textarea class="freeText" placeholder="Say whatever idk"></textarea>
+    <div class="freeTextError error"></div>
+
+    <fieldset>
+      <legend style="font-weight:700">can we still be friends</legend>
+      <div class="row">
+        <label><input type="radio" name="yesno3" value="yes" required /> Yes</label>
+        <label><input type="radio" name="yesno3" value="no" /> No</label>
+      </div>
+      <div id="yesno3Error" class="error" aria-live="polite"></div>
+    </fieldset>
+
+    <button type="submit">Submit</button>
+
+    <div id="result" aria-live="polite" style="margin-top:12px;"></div>
+  </form>
+
+<script>
+(function () {
+  const DICTIONARY_PATH = 'words_alpha.txt';
+
+  let dictionarySet = null;
+  let dictionaryLoaded = false;
+  let dictionaryLoadError = false;
+
+  // Load dictionary
+  fetch(DICTIONARY_PATH)
+    .then(r => r.text())
+    .then(t => {
+      dictionarySet = new Set(t.split(/\r?\n/).map(w=>w.trim().toLowerCase()).filter(Boolean));
+      dictionaryLoaded = true;
+    })
+    .catch(err => {
+      dictionaryLoadError = true;
+      console.error(err);
+    });
+
+  function extractWords(s) {
+    return s.trim()
+      .split(/\s+/)
+      .map(w => w.replace(/^[^A-Za-z0-9'-]+|[^A-Za-z0-9'-]+$/g, '').toLowerCase())
+      .filter(Boolean);
+  }
+
+  const form = document.getElementById('myForm');
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+
+    document.getElementById('result').textContent = '';
+    document.getElementById('yesnoError').textContent = '';
+    document.getElementById('numberError').textContent = '';
+
+    const yesno = form.elements['yesno'];
+    const numberInput = document.getElementById('numberInput');
+
+    const textAreas = document.querySelectorAll('.textInput');
+    const textErrors = document.querySelectorAll('.textError');
+
+    const sliders = document.querySelectorAll('.slider');
+    const sliderValues = document.querySelectorAll('.sliderValue');
+    const sliderErrors = document.querySelectorAll('.sliderError');
+
+    let ok = true;
+
+    // YES/NO
+    if (!Array.from(yesno).some(r=>r.checked)) {
+      document.getElementById('yesnoError').textContent = 'Please choose Yes or No.';
+      ok = false;
+    }
+    // SECOND YES/NO BLOCK
+    const yesno2 = form.elements['yesno2'];
+    if (!Array.from(yesno2).some(r => r.checked)) {
+      document.getElementById('yesno2Error').textContent = 'Please choose Yes or No.';
+      ok = false;
+    }
+    const yesno3 = form.elements['yesno3'];
+    if (!Array.from(yesno3).some(r => r.checked)) {
+      document.getElementById('yesno3Error').textContent = 'Please choose Yes or No.';
+      ok = false;
+    }
+
+    // NUMBER
+    if (numberInput.value.trim() === '' || isNaN(Number(numberInput.value))) {
+      document.getElementById('numberError').textContent = 'Please enter a valid number.';
+      ok = false;
+    }
+
+    // TEXTAREAS (multiple)
+    textAreas.forEach((ta, i) => {
+      const err = textErrors[i];
+      err.textContent = '';
+
+      if (dictionaryLoadError) {
+        err.textContent = 'Dictionary file failed to load.';
+        ok = false;
+        return;
+      }
+      if (!dictionaryLoaded) {
+        err.textContent = 'Dictionary still loading.';
+        ok = false;
+        return;
+      }
+
+      const words = extractWords(ta.value);
+      if (words.length < 20) {
+        err.textContent = `Please enter at least 20 words (you have ${words.length}).`;
+        ok = false;
+        return;
+      }
+
+      const missing = words.filter(w => !dictionarySet.has(w));
+      if (missing.length > 0) {
+        err.textContent = `Some words aren't real: ${missing.slice(0,25).join(', ')}`;
+        ok = false;
+      }
+    });
+
+    // SLIDERS (multiple)
+    sliders.forEach((slider, i) => {
+      const box = sliderValues[i];
+      const err = sliderErrors[i];
+
+      err.textContent = '';
+
+      const v = Number(box.value);
+      if (isNaN(v)) {
+        err.textContent = 'Must be numeric.';
+        ok = false;
+        return;
+      }
+
+      const min = Number(slider.min);
+      const max = Number(slider.max);
+
+      if (v < min || v > max) {
+        err.textContent = `Value must be between ${min} and ${max}.`;
+        ok = false;
+      }
+    });
+
+    if (!ok) {
+      document.getElementById('result').innerHTML =
+        '<span class="error">Form has errors.</span>';
+      return;
+    }
+    // BUILD JSON OF ALL FORM DATA
+    const payload = {
+      date_with_me: form.elements['yesno'].value,
+      times_dated: numberInput.value,
+      text_answers: Array.from(textAreas).map(t => t.value),
+      slider_values: Array.from(sliderValues).map(s => s.value),
+      enjoyed_date: form.elements['yesno2'].value,
+      still_be_friends: form.elements['yesno3'].value,
+      free_text: document.querySelector('.freeText').value
+    };
+
+    // SEND JSON USING EMAILJS
+    emailjs.send("service_9ei0o72", "template_igt7czj", {
+      message: JSON.stringify(payload, null, 2) // formatted JSON
+    })
+    .then(() => {
+      document.getElementById('result').innerHTML =
+        '<span class="success">Form sent!</span>';
+    })
+    .catch(err => {
+      document.getElementById('result').innerHTML =
+        '<span class="error">Sending failed: ' + err + '</span>';
+    });
+  });
+
+  // Sync sliders
+  document.querySelectorAll('.sliderBlock').forEach(block => {
+    const slider = block.querySelector('.slider');
+    const box = block.querySelector('.sliderValue');
+
+    box.value = slider.value;
+
+    slider.addEventListener('input', () => { box.value = slider.value; });
+    box.addEventListener('input', () => {
+      if (!isNaN(Number(box.value))) slider.value = box.value;
+    });
+  });
+})();
+</script>
+</body>
+</html>
