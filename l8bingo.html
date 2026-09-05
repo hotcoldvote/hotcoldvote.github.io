@@ -273,6 +273,7 @@
     }
     checkWins();
     updateTitle();
+    saveCurrentState();
   }
 
   function checkWins(){
@@ -351,6 +352,11 @@
     return true;
   }
 
+  function saveCurrentState() {
+    const code = encodeState();
+    const data = '#d=' + code;
+    localStorage.setItem('data', JSON.stringify(data));
+  }
   document.getElementById('newBoardBtn').addEventListener('click', startNewBoard);
   document.getElementById('makeOwnBtn').addEventListener('click', startNewBoard);
 
@@ -370,9 +376,7 @@
 
   addEventListener('beforeunload', ()=>{
     if (!viewOnly) {
-      const code = encodeState();
-      const data = '#d=' + code;
-      localStorage.setItem('data', JSON.stringify(data));
+      saveCurrentState();
     }
   });
 
