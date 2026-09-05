@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>L8 Bingo</title>
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="MyWebSite" />
+<link rel="manifest" href="/site.webmanifest" />
 <style>
   :root{
     --page-bg-image: none;
@@ -60,7 +66,7 @@
     transition:transform .55s cubic-bezier(.4,.2,.2,1);
     cursor:pointer;
   }
-  .cell.flipped .cell-inner{transform:rotateY(180deg);}
+  .cell.flipped .cell-inner{transform:rotateX(180deg);}
   .cell.readonly .cell-inner{cursor:default;}
   .face{
     position:absolute;inset:0;
@@ -77,6 +83,9 @@
   .face-front{
     background:var(--card-front-color) var(--box-bg-image) center/cover no-repeat;
   }
+  .cell.flipped .face-front span {
+    display: none;
+  }
   .face-front::before{
     content:"";position:absolute;inset:0;background:rgba(0,0,0,.25);
   }
@@ -84,7 +93,7 @@
   .face-back{
     background:var(--green);
     color:#fff;
-    transform:rotateY(180deg);
+    transform:rotateX(180deg);
     font-size:clamp(10px,2.8vw,13px);
   }
   .cell.win .face{outline:3px solid #ffd54a;box-shadow:0 0 14px 3px #ffd54a88;}
@@ -307,16 +316,29 @@
   }
 
   function loadFromHash(){
-    const hash = location.hash.startsWith('#s=') ? location.hash.slice(3) : null;
-    if(!hash) return false;
+    let hash = location.hash.startsWith('#s=') ? location.hash.slice(3) : null;
+    let d = null;
+    if(!hash) {
+      d = JSON.parse(localStorage.getItem("data"));
+      if (d) {
+        hash = d.slice(3)
+      }
+      else return false;
+    }
     const decoded = decodeState(hash);
     if(!decoded) return false;
     perm = decoded.perm;
     flipped = decoded.flipped;
     announcedLines = new Set();
-    viewOnly = true;
-    viewBanner.style.display = 'block';
-    controls.style.display = 'none';
+    if (!d) {
+      viewOnly = true;
+      viewBanner.style.display = 'block';
+      controls.style.display = 'none';
+    } else {
+      viewOnly = false;
+      viewBanner.style.display = 'none';
+      controls.style.display = 'block';
+    }
     buildBoard();
     // still allow win popup to show for a fully-shared winning board
     LINES.forEach((line, idx)=>{
@@ -343,6 +365,14 @@
       });
     } else {
       prompt('Copy this link:', url);
+    }
+  });
+
+  addEventListener('beforeunload', ()=>{
+    if (!viewOnly) {
+      const code = encodeState();
+      const data = '#d=' + code;
+      localStorage.setItem('data', JSON.stringify(data));
     }
   });
 
