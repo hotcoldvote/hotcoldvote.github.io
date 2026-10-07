@@ -1,5 +1,5 @@
 //constants
-
+//test if github working
 const K = 40;
 
 //functions
